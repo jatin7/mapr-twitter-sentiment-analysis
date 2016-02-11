@@ -1,0 +1,23 @@
+- name: Install repository GPG key
+  rpm_key: state=present key=https://packages.elastic.co/GPG-KEY-elasticsearch
+
+- name: Configure yum repository
+  copy:
+    src=elasticsearch.repo
+    dest=/etc/yum.repos.d/elasticsearch.repo
+
+- name: Install yum package
+  yum: name=elasticsearch state=present
+  notify: Start Elasticsearch on boot
+
+- name: Configure Elasticsearch
+  template:
+    src=elasticsearch.yml.j2
+    dest=/etc/elasticsearch/elasticsearch.yml
+    owner=root
+    group=root
+    mode=0644
+  notify: Restart Elasticsearch
+
+- name: Start service
+  service: name=elasticsearch state=started

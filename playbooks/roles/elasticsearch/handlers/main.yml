@@ -1,0 +1,9 @@
+---
+# handlers
+- name: Start Elasticsearch on boot
+  service: name=elasticsearch enabled=yes
+
+- name: Restart Elasticsearch
+  service:
+    name=elasticsearch
+    state=restarted
