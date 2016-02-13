@@ -1,0 +1,32 @@
+- name: Check if kibana is already installed
+  stat: path="{{kibana_path}}/{{kibana_version}}/bin/kibana"
+  changed_when: false
+  register: kibana_installed
+
+- name: Download archive
+  get_url: url=https://download.elastic.co/kibana/kibana/{{kibana_version}}.tar.gz dest=/tmp/
+  when: kibana_installed.stat.exists == false
+
+- name: Untar archive
+  unarchive: src=/tmp/{{kibana_version}}.tar.gz dest={{kibana_path}} copy=no
+  when: kibana_installed.stat.exists == false
+
+- group: name=kibana state=present
+
+- user: name=kibana group=kibana
+
+- file: path={{kibana_path}}/{{kibana_version}} owner=kibana group=kibana recurse=yes
+
+- name: Configure init.d script
+  template:
+    src=kibana.init.d.j2
+    dest=/etc/init.d/kibana
+    owner=root
+    group=root
+    mode=0744
+
+- name: Start on boot
+  service: name=kibana enabled=yes
+
+- name: Start service
+  service: name=kibana state=started

@@ -17,6 +17,7 @@ Vagrant.configure(2) do |config|
   config.vm.define "mapr" do |server|
     server.vm.box = "mkieboom/mapr-spark-drill"
     server.vm.network "forwarded_port", guest: 9200, host: 9200
+    server.vm.network "forwarded_port", guest: 5601, host: 5601
     server.vm.provision "ansible" do |ansible|
       ansible.playbook = "playbooks/site.yml"
     end
